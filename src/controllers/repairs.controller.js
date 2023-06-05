@@ -42,7 +42,7 @@ exports.updateRepair = async (req, res) => {
     // 😋 5. envio de confimacion exitoso
     return res.status(200).json({
       status: 'success',
-      message: 'The repairs has been updated',
+      message: 'The repairs has been completed',
     });
   } catch (error) {
     return res.status(500).json({
@@ -84,7 +84,7 @@ exports.firsRepair = async (req, res) => {
     const repair = await Repair.findOne({
       where: {
         id,
-        status: 'pending😎',
+        status: 'created😎',
       },
     });
 

@@ -55,7 +55,7 @@ exports.updateRepair = async (req, res) => {
 exports.createRepair = async (req, res) => {
   try {
     // 1. obtener informacion a crear de la req.Body
-    const { date, body } = req.body;
+    const { date, userId } = req.body;
 
     // 2. crear la reparacion utilizando el dmodelo.
 
@@ -67,7 +67,7 @@ exports.createRepair = async (req, res) => {
 
     return res.status(201).json({
       message: 'the repair has been created.🥳🥳🥳',
-      repairs,
+      repair,
     });
   } catch (error) {
     return res.status(500).json({

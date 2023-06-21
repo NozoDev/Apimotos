@@ -12,6 +12,14 @@ const Product = db.define('repair', {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  motorsNumber: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: false,
+  },
   status: {
     type: DataTypes.STRING,
     allowNull: false,

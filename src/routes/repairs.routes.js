@@ -7,18 +7,30 @@ const repairsController = require('./../controllers/repairs.controller');
 const validationsMiddleware = require('../middlewares/validations.middleware');
 const authMiddleware = require('../middlewares/auth.middleware');
 const repairMiddleware = require('../middlewares/repair.middleware');
-const { router } = express.Router();
+
+const { Router } = require('express');
 const router = Router();
 
 router
   .route('/')
-  .get(repairsController.firstRepairs)
-  .post(repairsController.createRepair);
+  .get(
+    authMiddleware.protect,
+    authMiddleware.restrictTo('employee'),
+    repairsController.firstRepairs
+  )
+
+  .post(
+    validationsMiddleware.createRepairValidation,
+    repairsController.createRepair
+  );
 
 router
+  .use(authMiddleware.protect)
+  .use(authMiddleware.restrictTo('employee'))
+  .use('/:id', repairMiddleware.validRepair)
   .route('/:id')
   .get(repairsController.firsRepair)
-  .patch(repairsController.updateRepair)
-  .delete(repairsController.deleteRepair);
+  .patch(authMiddleware.protectAccountOwner, repairsController.updateRepair)
+  .delete(authMiddleware.protectAccountOwner, repairsController.deleteRepair);
 
 module.exports = router;

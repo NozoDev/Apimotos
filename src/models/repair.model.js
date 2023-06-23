@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
 const { db } = require('./../database/config');
 
-const Product = db.define('repair', {
+const Repair = db.define('repairs', {
   id: {
     primaryKey: true,
     autoIncrement: true,
@@ -9,7 +9,7 @@ const Product = db.define('repair', {
     type: DataTypes.INTEGER,
   },
   date: {
-    type: DataTypes.STRING,
+    type: DataTypes.DATE,
     allowNull: false,
   },
   motorsNumber: {
@@ -21,14 +21,13 @@ const Product = db.define('repair', {
     allowNull: false,
   },
   status: {
-    type: DataTypes.STRING,
+    type: DataTypes.ENUM('pending', 'completed', 'cancelled'),
     allowNull: false,
     defaultValue: 'pending',
-    enum: ['pending', 'completed', 'cancelled'],
   },
   userId: {
-    type: DataTypes.STRING,
+    type: DataTypes.INTEGER,
     allowNull: false,
   },
 });
-module.exports = Product;
+module.exports = Repair;

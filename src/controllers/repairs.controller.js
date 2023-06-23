@@ -1,140 +1,74 @@
 const Repair = require('../models/repair.model');
+const Users = require('../models/user.modal');
+const catchAsync = require('../utils/catchAsync');
 
-exports.firstRepairs = async (req, res) => {
+exports.firstRepairs = catchAsync(async (req, res, next) => {
   const time = req.requesTime;
 
   const repairs = await Repair.findAll({
     where: {
       status: 'pending',
     },
+    attributes: {
+      exclude: ['status'],
+    },
   });
+
   return res.json({
     requesTime: time,
-    results: repairs.lenght,
     status: 'sucess',
-    message: 'Repair Found',
+    results: repairs.lenght,
     repairs,
   });
-};
-exports.updateRepair = async (req, res) => {
-  try {
-    //😁 1. Traernos el producto que ibamos a actualizar
-    const { id } = req.params;
-    //😅 2. Nos trajimos de el body la informacion que vamos a actualizar
-    const { status } = req.body;
-    //😎  3. Buscar el producto que vamos a actualizar
-    const repairs = await Repair.findOne({
-      where: {
-        id,
-        status: 'pending',
-      },
-    });
+});
 
-    if (!repairs) {
-      return res.status(400).json({
-        status: 'error',
-        message: `The repairs with id ${id} is wrong`,
-      });
-    }
-    // 😁 4. Proceso a actuazlizarlo
-    await Repair.update({ status });
+exports.createRepair = catchAsync(async (req, res, next) => {
+  const { date, motorsNumber, description } = req.body;
+  const { id } = req.sessionUser;
 
-    // 😋 5. envio de confimacion exitoso
-    return res.status(200).json({
-      status: 'success',
-      message: 'The repairs has been completed',
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong😫😫',
-    });
-  }
-};
+  const repair = await Repair.create({
+    date,
+    motorsNumber: motorsNumber.toLowerCase(),
+    description,
+    userId: id,
+  });
 
-exports.createRepair = async (req, res) => {
-  try {
-    // 1. obtener informacion a crear de la req.Body
-    const { date, userId } = req.body;
+  res.status(201).json({
+    message: 'Motorcycle repair created successfully',
+    repair,
+  });
+});
 
-    // 2. crear la reparacion utilizando el dmodelo.
+exports.updateRepair = catchAsync(async (req, res) => {
+  const { repair, user } = req;
 
-    const repair = await Repair.create({
-      date,
-      userId,
-    });
-    // 3. enviar una respuesta al cliente
+  const updatedRepair = await repair.update({ status: 'completed' });
 
-    return res.status(201).json({
-      message: 'the repair has been created.🥳🥳🥳',
-      repair,
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'fail',
-      message: 'Something went very wrong',
-    });
-  }
-};
+  res.status(200).json({
+    status: 'success',
+    message: 'Repair updated',
+    repair: updatedRepair,
+    user,
+  });
+});
 
-exports.firsRepair = async (req, res) => {
-  try {
-    const { id } = req.params;
+exports.firsRepair = catchAsync(async (req, res) => {
+  const { repair } = req;
 
-    const repair = await Repair.findOne({
-      where: {
-        id,
-        status: 'created😎',
-      },
-    });
+  return res.status(200).json({
+    status: 'success',
+    message: 'Repair Found😚',
+    repair,
+  });
+});
 
-    if (!repair) {
-      return res.status(400).json({
-        status: 'error',
-        message: `the repair with id ${id} not found`,
-      });
-    }
-
-    return res.status(200).json({
-      status: 'success',
-      message: 'Hello from the get products 🥱🥱',
-      repair,
-    });
-  } catch (error) {
-    res.status(500).json({
-      status: 'fail',
-      message: 'something went very wrong',
-    });
-  }
-};
 exports.deleteRepair = async (req, res) => {
-  try {
-    const { id } = req.params.id;
+  const { repair } = req;
 
-    const repair = await Repair.findOne({
-      where: {
-        id,
-        status: true,
-      },
-    });
+  await repair.update({ status: 'cancelled😪' });
 
-    if (!repair) {
-      return res.status(404).json({
-        status: 'error',
-        message: `Repair with id ${id} not found`,
-      });
-    }
-
-    await repair.update({ status: 'Cancelled' });
-
-    return res.status(200).json({
-      status: 'success',
-      message: 'I am sorry you repais has been deleted 😥😌',
-    });
-  } catch (error) {
-    return res.status(500).json({
-      status: 'fail',
-      message: 'something went very wrong 😪😫',
-    });
-  }
+  res.status(200).json({
+    status: 'success',
+    message: `repair with id:${repair.id} has been deleted`,
+  });
 };

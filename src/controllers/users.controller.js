@@ -61,7 +61,7 @@ exports.createUser = catchAsync(async (req, res, next) => {
   });
 });
 
-exports.login = catchAsync(async (req, res, nex) => {
+exports.login = catchAsync(async (req, res, next) => {
   const { email, password } = req.body;
 
   const user = await User.findOne({
@@ -78,6 +78,7 @@ exports.login = catchAsync(async (req, res, nex) => {
   if (!(await bcrypt.compare(password, user.password))) {
     return next(new AppError('wrong email or password😁', 401));
   }
+
   const token = await generateJWT(user.id);
 
   res.status(200).json({
@@ -93,26 +94,12 @@ exports.login = catchAsync(async (req, res, nex) => {
 });
 
 exports.firsUser = catchAsync(async (req, res, next) => {
-  const { id } = req.params;
-
-  const oneUser = await User.findOne({
-    where: {
-      id,
-      status: 'available',
-    },
-  });
-
-  if (!oneUser) {
-    return res.status(404).json({
-      status: 'error',
-      message: `user with id: ${id} was n ot found`,
-    });
-  }
+  const { user } = req.params;
 
   return res.status(200).json({
     status: 'success',
-    message: 'user found',
-    oneUser,
+    message: 'User Found😂',
+    user,
   });
 });
 
